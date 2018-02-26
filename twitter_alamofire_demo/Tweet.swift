@@ -20,8 +20,21 @@ class Tweet {
     var user: User // Contains name, screenname, etc. of tweet author
     var createdAtString: String // Display date
     
+    //For Retweets
+    var retweetedByUser: User?
+    
     // MARK: - Create initializer with dictionary
     init(dictionary: [String: Any]) {
+        var dictionary = dictionary
+        
+        // Is this a re-tweet?
+        if let originalTweet = dictionary["retweeted_status"] as? [String: Any] {
+            let userDictionary = dictionary["user"] as! [String: Any]
+            self.retweetedByUser = User(dictionary: userDictionary)
+        
+            dictionary = originalTweet
+        }
+        
         id = dictionary["id"] as! Int64
         text = dictionary["text"] as! String
         favoriteCount = dictionary["favorite_count"] as? Int
@@ -43,8 +56,14 @@ class Tweet {
         formatter.timeStyle = .none
         // Convert Date to String
         createdAtString = formatter.string(from: date)
-        
-        
     }
+    
+    static func tweets(with array: [[String: Any]]) -> [Tweet] {
+        return array.flatMap({ (dictionary) -> Tweet in
+            Tweet(dictionary: dictionary)
+        })
+    }
+    
+    
 }
 

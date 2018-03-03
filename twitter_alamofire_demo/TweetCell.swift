@@ -23,13 +23,7 @@ class TweetCell: UITableViewCell {
     
     var tweet: Tweet! {
         didSet {
-            //profileImageView.af_setImage(withURL: tweet.user.profileImageUrl)
-            nameLabel.text = tweet.user.name
-            screenNameAndDateLabel.text = tweet.user.screenName! + " • " + tweet.createdAtString
-            tweetBodyLabel.text = tweet.text
-            //numRepliesLabel = tweet.repliesCount
-            numRetweetsLabel.text = String(tweet.retweetCount)
-            numFavoritesLabel.text = String(tweet.favoriteCount!)
+            refreshData()
         }
     }
     
@@ -39,10 +33,53 @@ class TweetCell: UITableViewCell {
     }
     
     @IBAction func didTapFavorite(_ sender: Any) {
-        //tweet.favorited = true
-        //tweet.favoriteCount! += 1
+        if(tweet.favorited!){
+            tweet.favorited = false
+            tweet.favoriteCount! -= 1
+            APIManager.shared.unfavorite(tweet) { (tweet: Tweet?, error: Error?) in
+                if let  error = error {
+                    print("Error favoriting tweet: \(error.localizedDescription)")
+                } else if let tweet = tweet {
+                    print("Successfully favorited the following Tweet: \n(tweet.text)")
+                }
+            }
+        }
+        else{
+            tweet.favorited = true
+            tweet.favoriteCount! += 1
+            APIManager.shared.favorite(tweet) { (tweet: Tweet?, error: Error?) in
+                if let  error = error {
+                    print("Error favoriting tweet: \(error.localizedDescription)")
+                } else if let tweet = tweet {
+                    print("Successfully favorited the following Tweet: \n(tweet.text)")
+                }
+            }
+        }
+        refreshData()
     }
     
+    func refreshData(){
+        if(tweet.favorited!){
+            favoriteButton.setImage(#imageLiteral(resourceName: "favor-icon-red"), for: UIControlState.normal)
+        }
+        else{
+            favoriteButton.setImage(#imageLiteral(resourceName: "favor-icon"), for: UIControlState.normal)
+        }
+        if(tweet.retweeted){
+            retweetButton.setImage(#imageLiteral(resourceName: "retweet-icon-green"), for: UIControlState.normal)
+        }
+        else{
+            retweetButton.setImage(#imageLiteral(resourceName: "retweet-icon"), for: UIControlState.normal)
+        }
+        
+        //profileImageView.af_setImage(withURL: tweet.user.profileImageUrl)
+        nameLabel.text = tweet.user.name
+        screenNameAndDateLabel.text = tweet.user.screenName! + " • " + tweet.createdAtString
+        tweetBodyLabel.text = tweet.text
+        //numRepliesLabel = tweet.repliesCount
+        numRetweetsLabel.text = String(tweet.retweetCount)
+        numFavoritesLabel.text = String(tweet.favoriteCount!)
+    }
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)

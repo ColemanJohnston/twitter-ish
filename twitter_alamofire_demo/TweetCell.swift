@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import AlamofireImage
+import Alamofire
 
 class TweetCell: UITableViewCell {
     
@@ -38,9 +40,9 @@ class TweetCell: UITableViewCell {
             tweet.favoriteCount! -= 1
             APIManager.shared.unfavorite(tweet) { (tweet: Tweet?, error: Error?) in
                 if let  error = error {
-                    print("Error favoriting tweet: \(error.localizedDescription)")
+                    print("Error unfavoriting tweet: \(error.localizedDescription)")
                 } else if let tweet = tweet {
-                    print("Successfully favorited the following Tweet: \n(tweet.text)")
+                    print("Successfully unfavorited the following Tweet: \n(tweet.text)")
                 }
             }
         }
@@ -52,6 +54,34 @@ class TweetCell: UITableViewCell {
                     print("Error favoriting tweet: \(error.localizedDescription)")
                 } else if let tweet = tweet {
                     print("Successfully favorited the following Tweet: \n(tweet.text)")
+                }
+            }
+        }
+        refreshData()
+    }
+    
+    @IBAction func didTapRetweet(_ sender: Any) {
+        if(tweet.retweeted){
+            tweet.retweeted = false
+            tweet.retweetCount -= 1
+            //call call API manager to unretweet the tweet
+            APIManager.shared.unRetweet(tweet) { (tweet: Tweet?, error: Error?) in
+                if let  error = error {
+                    print("Error unretweeting tweet: \(error.localizedDescription)")
+                } else if let tweet = tweet {
+                    print("Successfully unretweeted the following Tweet: \n(tweet.text)")
+                }
+            }
+        }
+        else{
+            tweet.retweeted = true
+            tweet.retweetCount += 1
+            //call API manager to retweet the tweet
+            APIManager.shared.retweet(tweet) { (tweet: Tweet?, error: Error?) in
+                if let  error = error {
+                    print("Error retweeting tweet: \(error.localizedDescription)")
+                } else if let tweet = tweet {
+                    print("Successfully retweeted the following Tweet: \n(tweet.text)")
                 }
             }
         }
@@ -72,7 +102,7 @@ class TweetCell: UITableViewCell {
             retweetButton.setImage(#imageLiteral(resourceName: "retweet-icon"), for: UIControlState.normal)
         }
         
-        //profileImageView.af_setImage(withURL: tweet.user.profileImageUrl)
+        profileImageView.af_setImage(withURL: tweet.user.profileImageUrl!)
         nameLabel.text = tweet.user.name
         screenNameAndDateLabel.text = tweet.user.screenName! + " • " + tweet.createdAtString
         tweetBodyLabel.text = tweet.text

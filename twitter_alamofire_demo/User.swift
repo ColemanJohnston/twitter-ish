@@ -18,7 +18,7 @@ class User {
     init(dictionary: [String: Any]) {
         name = dictionary["name"] as! String
         screenName = dictionary["screen_name"] as! String
-        profileImageUrl = URL(string: dictionary["profile_image_url"] as! String)
+        profileImageUrl = URL(string: dictionary["profile_image_url_https"] as! String)
     
     
     

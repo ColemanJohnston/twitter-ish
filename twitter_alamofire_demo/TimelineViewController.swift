@@ -76,10 +76,25 @@ class TimelineViewController: UIViewController, UITableViewDelegate, UITableView
         APIManager.shared.logout()
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let dest = segue.destination
+        
+        //assume if sender is the detailViewController sender was a TweetCell
+        if(dest is DetailViewController){
+            let detail = dest as! DetailViewController
+            if(sender is TweetCell){
+                let cell = sender as? TweetCell
+                if let cell = cell{
+                    detail.tweet = cell.tweet
+                }
+            }
+        }
+        
+    }
     
     /*
      // MARK: - Navigation
-     
+    
      // In a storyboard-based application, you will often want to do a little preparation before navigation
      override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
      // Get the new view controller using segue.destinationViewController.

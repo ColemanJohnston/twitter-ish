@@ -83,10 +83,10 @@ class TimelineViewController: UIViewController, UITableViewDelegate, UITableView
         if(dest is DetailViewController){
             let detail = dest as! DetailViewController
             if(sender is TweetCell){
-                let cell = sender as? TweetCell
-                if let cell = cell{
-                    detail.tweet = cell.tweet
-                }
+                let cell = sender as! TweetCell
+                //TODO: set up detailViewController to notify tweets array when tweet is changed
+                let indexPath = tableView.indexPath(for: cell)!
+                detail.tweet = tweets[indexPath.row]
             }
         }
         
@@ -101,5 +101,4 @@ class TimelineViewController: UIViewController, UITableViewDelegate, UITableView
      // Pass the selected object to the new view controller.
      }
      */
-    
 }

@@ -19,8 +19,6 @@ class DetailViewController: UIViewController {
     @IBOutlet weak var retweetButton: UIButton!
     @IBOutlet weak var favoriteButton: UIButton!
     
-    
-    
     var tweet: Tweet!
     
     override func viewDidLoad() {
@@ -32,14 +30,74 @@ class DetailViewController: UIViewController {
         numRetweetsLabel.text = String(describing: tweet.retweetCount)
         numFavoritesLabel.text = String(describing: tweet.favoriteCount!)
         profileImageView.af_setImage(withURL: tweet.user.profileImageUrl!)
-        
+        refreshRetweeted()
+        refreshFavorited()
+    }
+
+    @IBAction func didTapRetweet(_ sender: Any) {
+        if(tweet.retweeted){
+            tweet.retweeted = false
+            tweet.retweetCount -= 1
+            //call call API manager to unretweet the tweet
+            APIManager.shared.unRetweet(tweet) { (tweet: Tweet?, error: Error?) in
+                if let  error = error {
+                    print("Error unretweeting tweet: \(error.localizedDescription)")
+                } else if let tweet = tweet {
+                    print("Successfully unretweeted the following Tweet: \n(tweet.text)")
+                }
+            }
+        }
+        else{
+            tweet.retweeted = true
+            tweet.retweetCount += 1
+            //call API manager to retweet the tweet
+            APIManager.shared.retweet(tweet) { (tweet: Tweet?, error: Error?) in
+                if let  error = error {
+                    print("Error retweeting tweet: \(error.localizedDescription)")
+                } else if let tweet = tweet {
+                    print("Successfully retweeted the following Tweet: \n(tweet.text)")
+                }
+            }
+        }
+        refreshRetweeted()
+    }
+    
+    @IBAction func didTapFavorite(_ sender: Any) {
+        if(tweet.favorited!){
+            tweet.favorited = false
+            tweet.favoriteCount! -= 1
+            APIManager.shared.unfavorite(tweet) { (tweet: Tweet?, error: Error?) in
+                if let  error = error {
+                    print("Error unfavoriting tweet: \(error.localizedDescription)")
+                } else if let tweet = tweet {
+                    print("Successfully unfavorited the following Tweet: \n(tweet.text)")
+                }
+            }
+        }
+        else{
+            tweet.favorited = true
+            tweet.favoriteCount! += 1
+            APIManager.shared.favorite(tweet) { (tweet: Tweet?, error: Error?) in
+                if let  error = error {
+                    print("Error favoriting tweet: \(error.localizedDescription)")
+                } else if let tweet = tweet {
+                    print("Successfully favorited the following Tweet: \n(tweet.text)")
+                }
+            }
+        }
+        refreshFavorited()
+    }
+    
+    func refreshRetweeted(){
         if(tweet.retweeted){
             retweetButton.setImage(#imageLiteral(resourceName: "retweet-icon-green"), for: UIControlState.normal)
         }
         else{
             retweetButton.setImage(#imageLiteral(resourceName: "retweet-icon"), for: UIControlState.normal)
         }
-        
+    }
+    
+    func refreshFavorited(){
         if(tweet.favorited!){
             favoriteButton.setImage(#imageLiteral(resourceName: "favor-icon-red"), for: UIControlState.normal)
         }
@@ -47,15 +105,12 @@ class DetailViewController: UIViewController {
             favoriteButton.setImage(#imageLiteral(resourceName: "favor-icon"), for: UIControlState.normal)
         }
     }
-
-    
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
-
     /*
     // MARK: - Navigation
 
